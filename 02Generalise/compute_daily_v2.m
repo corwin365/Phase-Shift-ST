@@ -18,11 +18,11 @@ clearvars
 %minimum phase change to be meaningful (as
 
 %data to analyse
-% % Settings.DayScale         = datenum(2008,1,127);
-% % Settings.Granules         = [56];
-
-Settings.DayScale  = datenum(2010,10,16);
-Settings.Granules  = [186];
+Settings.DayScale         = datenum(2008,1,127);
+Settings.Granules         = [56];
+% 
+% Settings.DayScale  = datenum(2010,10,16);
+% Settings.Granules  = [186];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% processing
@@ -114,7 +114,7 @@ for iDay=1:1:numel(Settings.DayScale)
     %convert each levels CC values to covarying amplitude and phase
     AllA  = sqrt(abs(CC));
     AlldP = angle(   CC);
-    
+    stop
     %convert phase change to wavelength
     sz = size(AlldP);
     Lambda = permute(repmat(dZ,1,sz(1),sz(2)),[2,3,1])./AlldP.*2*pi;
