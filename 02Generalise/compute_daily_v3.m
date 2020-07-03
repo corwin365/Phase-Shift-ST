@@ -50,7 +50,7 @@ for iDay=1:1:numel(Settings.DayScale)
     %% 3dst the granule-pair
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    ST3D = gwanalyse_airs_3d(Airs);
+    ST3D = gwanalyse_airs_3d(Airs,'TwoDPlusOne',false);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% 2D+1 ST the granule pair
@@ -120,6 +120,7 @@ for iDay=1:1:numel(Settings.DayScale)
     dZ = [0;diff(Airs.ret_z)+ circshift(diff(Airs.ret_z),1)]; %levels this makes wonky wll be removed later
     Lambda = permute(repmat(dZ,1,sz(1),sz(2)),[2,3,1])./AlldP.*2*pi;
     clear sz AlldP dZ
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% retain the stuff we want, for comparison
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
