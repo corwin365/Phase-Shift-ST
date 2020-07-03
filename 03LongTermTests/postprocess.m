@@ -14,13 +14,13 @@ clearvars
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Settings.DataDir     = [LocalDataDir,'/corwin/airs_2dp1/'];
-Settings.TimeScale   = datenum(2008,5,1):1:datenum(2008,5,30);
+Settings.TimeScale   = datenum(2008,8,1):1:datenum(2008,8,30);
 Settings.LatScale    = -90:5:90;
 Settings.LonScale    = -180:5:180;
 Settings.HeightScale = 20:3:60;
 Settings.Vars        = {'A','k','l','m'};
 Settings.Modes       ={'3D','2D'};
-Settings.OutFile     = 'out.mat';
+Settings.OutFile     = 'out_august2008.mat';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %prepare grids
