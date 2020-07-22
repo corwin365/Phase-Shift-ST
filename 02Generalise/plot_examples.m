@@ -17,18 +17,21 @@ clearvars
 
 
 % % %data to analyse
-Settings.Day = datenum(2008,1,127);
-Settings.GiD = [56];
-Settings.SampleIndices = [174,34];
+% % Settings.Day = datenum(2008,1,127);
+% % Settings.GiD = [56];
+% % Settings.SampleIndices = [174,34];
+% % Settings.Fig = 1;
 
 
 % % Settings.Day = datenum(2010,10,16);
 % % Settings.GiD = 186;
 % % Settings.SampleIndices = [128,38];
+% % Settings.Fig = 2;
 
-% Settings.Day = datenum(2007,1,13);
-% Settings.GiD = [122];
-% Settings.SampleIndices = [78,57];
+Settings.Day = datenum(2007,1,13);
+Settings.GiD = [122];
+Settings.SampleIndices = [78,57];
+Settings.Fig = 3;
 
 
 
@@ -37,26 +40,30 @@ Settings.SampleIndices = [174,34];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %get granule
-Airs  = cat_struct(prep_airs_3d(Settings.Day,Settings.GiD,  'PreSmooth',[3,3,1]),   ...
-                   prep_airs_3d(Settings.Day,Settings.GiD+1,'PreSmooth',[3,3,1]), ...
-                   2,{'MetaData','Source','ret_z'});
+% % Airs  = cat_struct(prep_airs_3d(Settings.Day,Settings.GiD,  'PreSmooth',[3,3,1]),   ...
+% %                    prep_airs_3d(Settings.Day,Settings.GiD+1,'PreSmooth',[3,3,1]), ...
+% %                    2,{'MetaData','Source','ret_z'});
 
+Airs = prep_airs_3d(Settings.Day,Settings.GiD,  'PreSmooth',[3,3,1]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3dst the granule-pair
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-[ST3D,Airs] = gwanalyse_airs_3d(Airs,'TwoDPlusOne',true);
+[ST3D,Airs] = gwanalyse_airs_3d(Airs,                  ...
+                               'ZRange',      [10,70], ...
+                               'TwoDPlusOne',    true, ...
+                               'TwoDPlusOne_ind',true);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% plot some maps
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-z = 30;
+z = 40;
 zidx = closest(z,Airs.ret_z);
 z = Airs.ret_z(zidx);
 
-figure(1)
+figure(Settings.Fig)
 clf
 set(gcf,'color','w')
 redyellowblue32
@@ -66,9 +73,11 @@ pcolor(Airs.l1_lon,Airs.l1_lat,squeeze(ST3D.A(:,:,zidx))); shading flat; colorba
 title(['Amplitude, 3DST, ',num2str(z),'km altitude'])
 
 
-% % subplot(2,2,2)
-% % pcolor(Airs.l1_lon,Airs.l1_lat,squeeze(ST3D.A_2dp1(:,:,zidx))); shading flat; colorbar
-% % title(['Amplitude, 2D+1, ',num2str(z),'km altitude'])
+subplot(2,2,2)
+pcolor(Airs.l1_lon,Airs.l1_lat,1./squeeze(ST3D.m_2dp1_ind(:,:,zidx))); shading flat; colorbar
+title(['\lambda_z, 2D+1,ind fit, ',num2str(z),'km altitude'])
+caxis([10 40])
+
 
 subplot(2,2,3)
 pcolor(Airs.l1_lon,Airs.l1_lat,1./squeeze(ST3D.m(:,:,zidx))); shading flat; colorbar
@@ -88,34 +97,29 @@ sgtitle([datestr(Settings.Day),', g',num2str(Settings.GiD)])
 %% plot some profiles
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-figure(2); set(gcf,'color','w'); clf
+%create figure
+figure(10+Settings.Fig)
+clf
+set(gcf,'color','w')
+redyellowblue32
 
-subplot(1,4,1)
-plot(squeeze(ST3D.IN(Settings.SampleIndices(2),Settings.SampleIndices(1),:)),Airs.ret_z,'color','r')
+%average wavelength over strong-signal area
+NoSignal = find(ST3D.A < 2.5);
+
+m.ST3D   = abs(ST3D.m);
+m.ST2Dv1 = abs(ST3D.m_2dp1_ind);
+m.ST2Dv2 = abs(ST3D.m_2dp1);
+
+m.ST3D(  NoSignal) = NaN; m.ST3D   = squeeze(nanmean(m.ST3D,  [1,2]));
+m.ST2Dv1(NoSignal) = NaN; m.ST2Dv1 = squeeze(nanmean(m.ST2Dv1,[1,2]));
+m.ST2Dv2(NoSignal) = NaN; m.ST2Dv2 = squeeze(nanmean(m.ST2Dv2,[1,2]));
 
 
-subplot(1,4,2)
-A.ST3D = ST3D.A; A.ST3D(A.ST3D < 1.5) = NaN;
-plot(squeeze(nanmean(A.ST3D,[1,2])),Airs.ret_z,'color','r')
+
+
+subplot(1,3,1)
+axis([0,60,10,70])
 hold on
-% % A.ST2D = ST3D.A_2dp1; A.ST2D(A.ST2D < 1.5) = NaN;
-% % plot(squeeze(nanmean(A.ST2D,[1,2])),Airs.ret_z,'color','k')
-% % title('Amplitude')
-
-subplot(1,4,3)
-A.ST3D = ST3D.A; m = ST3D.m; m(A.ST3D < 1.5) = NaN;
-plot(1./squeeze(nanmean(m,[1,2])),Airs.ret_z,'color','r')
-hold on
-A.ST2D = ST3D.A; m = abs(ST3D.m_2dp1); m(A.ST2D < 1.5) = NaN;
-plot(squeeze(1./nanmean(m,[1,2])),Airs.ret_z,'color','k')
-title('Lz')
-xlim([10 40])
-
-% % subplot(1,4,4)
-% % A.ST3D = ST3D.A; k = ST3D.k; k(A.ST3D < 1.5) = NaN;
-% % plot(1./squeeze(nanmean(k,[1,2])),Airs.ret_z,'color','r')
-% % hold on
-% % A.ST2D = ST3D.A_2dp1; k = ST3D.k_2dp1; k(A.ST2D < 1.5) = NaN;
-% % plot(squeeze(1./nanmean(k,[1,2])),Airs.ret_z,'color','k')
-% % title('k^{-1}')
-% % xlim([0 2000])
+plot(1./m.ST3D,  Airs.ret_z,'color','k')
+plot(1./m.ST2Dv1,Airs.ret_z,'color','r')
+plot(1./m.ST2Dv2,Airs.ret_z,'color','b')
