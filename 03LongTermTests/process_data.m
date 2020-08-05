@@ -14,8 +14,8 @@
 %% settings
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Settings.DayScale  = datenum(2008,1,127);%datenum(2010,10,8):1:datenum(2010,10,20);
-Settings.OutDir = [LocalDataDir,'/corwin/airs_2dp1/';
+Settings.DayScale  = datenum(2008,1,127);%datenum(2010,10,8):1:datenum(2010,10,20);
+Settings.OutDir = [LocalDataDir,'/corwin/airs_2dp1/'];
 
 
 
