@@ -14,13 +14,13 @@ clearvars
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %cases to plot: {Date,Granules,XT row, AT row}
-Cases.Case1 = {datenum(2008,1,127),[57],35,45};
+Cases.Case1 = {datenum(2008,1,127),[57],30,45};
 Cases.Case2 = {datenum(2007,1,13),[122],80,55};
 Cases.Case3 = {datenum(2005,7,8),[85,86],110,25};
 Cases.Case4 = Cases.Case1; %placeholder
 
 %how many elements to plot each side of wave centre
-Settings.Length = 30;
+Settings.Length = 35;
 
 %letters for labelling
 Letters = 'abcdefghijklmnopqrstuvwxyz'; lettercount = 0;
@@ -50,13 +50,13 @@ for iCase=1:1:numel(fieldnames(Cases))
     [Airs,Spacing] = prep_airs_3d(Case{1},Granules(iGranule),'PreSmooth',[3,3,1]);
     
     %3D S-Transform the granule
-    ST = gwanalyse_airs_3d(Airs,'ZRange',[0 90]);
+    ST = gwanalyse_airs_3d(Airs,'ZRange',[0 90],'TwoDPlusOne',true);
 
     %store granule
     Airs = rmfield(Airs,{'ret_temp','MetaData','Source'}); 
-    Airs.Lz = 1./ST.m; Airs.A = ST.A;
-    
-    
+    Airs.Lz  = 1./ST.m;      Airs.A  = ST.A;
+    Airs.Lz2 = 1./ST.m_2dp1; Airs.A2 = ST.A_2dp1;     
+
     if iGranule == 1; Data = Airs; 
     else Data = cat_struct(Data,Airs,2,{'ret_z'});
     end
@@ -105,8 +105,14 @@ for iCase=1:1:numel(fieldnames(Cases))
         ToPlot = squeeze(Data.Lz(:,Settings.Length+1,:))'; %at Lz 
         Colours = cbrewer('seq','Blues',33);
         Range = [15 25];
-      case 4; continue
-      case 5; continue
+      case 4; 
+        ToPlot = squeeze(Data.A2( :,Settings.Length+1,:))'; %at A
+        Colours = cbrewer('seq','Greens',33);
+        Range = [0 3];
+      case 5;
+        ToPlot = abs(squeeze(Data.Lz2(:,Settings.Length+1,:)))'; %at Lz
+        Colours = cbrewer('seq','Blues',33);
+        Range = [15 25];
     end
     
 
@@ -117,6 +123,7 @@ for iCase=1:1:numel(fieldnames(Cases))
 %     end
    
     %plot
+%     contourf(xp,Data.ret_z,ToPlot,linspace(Range(1),Range(2),16),'edgecolor','none')
     imagesc(xp,Data.ret_z,ToPlot); hold on
     
     %tidy

@@ -13,18 +13,15 @@ clearvars
 %% settings
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% % InFile = 'stout_2008d127g056_thin0.mat';
-% % InFile = 'stout_2008d127g056_thin1.mat';
-InFile = 'stout_2010d289g186_thin0.mat';
-% % InFile = 'stout_2010d289g186_thin1.mat';
-% % InFile = 'stout_2010d289g186_thin0.mat';
-% % InFile = 'stout_2007d013g122_thin1.mat';
+InFile = 'stout_2007d013g122_thin1.mat';
 
 
 Peak = 1; %which peak in the data (1 = largest)
 
 load(InFile);
 
+% % Store.A = Store.A2;
+% % Store.L = Store.L2;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% loop over vars
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,6 +141,6 @@ for iVar=1:1:2;
     
   end
  
-% %   export_fig([InFile,'_',num2str(iVar)],'-png','-m1','-a3')
+% %   export_fig([InFile,'_',num2str(iVar),'_fixed'],'-png','-m1','-a3')
   
 end

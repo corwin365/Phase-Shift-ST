@@ -25,8 +25,8 @@ clearvars
 % % Settings.Day = datenum(2010,10,16);
 % % Settings.GiD = 186;
 
-% % Settings.Day = datenum(2007,1,13);
-% % Settings.GiD = [122];
+Settings.Day = datenum(2007,1,13);
+Settings.GiD = [122];
 
 % % Settings.Day = datenum(2005,7,8);
 % % Settings.GiD = 85;
@@ -89,20 +89,20 @@ for iLevel=1:1:numel(Airs.ret_z);
   
   %compute weight
   CFac = exp(-(Airs.ret_z(iLevel)-42) ./ (2*scale_height(42)));  
-        
 
-  %store unweighted fields
+  %store fields
   if iLevel == 1;
     %first level: just store
     Store.ST_Unweighted = ST.ST;
-    Store.ST_Weighted   = ST.ST .* CFac;
+    Store.ST_Weighted   = ST.ST.*CFac;
     freqs = ST.freqs; %needed later
   else
     %subsequent level: integrate into existing average
-    Store.ST_Unweighted = ((iLevel-1).*Store.ST_Unweighted + Store.ST_Unweighted)./iLevel;
-    Store.ST_Weighted   = ((iLevel-1).*Store.ST_Weighted   + Store.ST_Weighted)./iLevel;
+    Store.ST_Unweighted = ((iLevel-1).*Store.ST_Unweighted + ST.ST        )./iLevel;
+    Store.ST_Weighted   = ((iLevel-1).*Store.ST_Weighted   + ST.ST .* CFac)./iLevel;
   end
-  
+
+
   %and loop
   textprogressbar(iLevel./numel(Airs.ret_z).*100)
 end
@@ -278,62 +278,66 @@ for iLevel=1:1:size(Airs.ret_z,1);
   end
   textprogressbar(iLevel ./ size(Airs.ret_z,1) .* 100);  
 end; 
-% clear iLevel iX iY iZ iMode iStep CoSpectrum CS dPhi
-% clear idx1 idx2 dZ ST1 ST2 f1 f2 freqs PeakStore
-% Store = rmfield(Store,{'STs','ST_Unweighted','ST_Weighted'});
+clear iLevel iX iY iZ iMode iStep CoSpectrum CS dPhi
+clear idx1 idx2 dZ ST1 ST2 f1 f2 freqs PeakStore
+Store = rmfield(Store,{'STs','ST_Unweighted','ST_Weighted'});
 textprogressbar('!')
   
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% phase unwrapping
-%only implemented for base-level relative, as:
-%(i) it's hard to do for the others
-%(ii) they're over short ranges so should be fine anyway
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-for iStep=1:1:numel(Settings.Steps)  
-  if Settings.Steps(iStep) == 0;
-    
-    %pull out L
-    L = Store.L(:,:,:,:,iStep,:);
-
-    %convert back to phases
-    sz = size(L);
-    dZ = permute(Airs.ret_z - Airs.ret_z(zidx),[2,3,1,4,5,6]);
-    dZ = repmat(dZ,sz(1),sz(2),1,sz(4),sz(5),sz(6));
-    L = L./dZ./(2*pi);
-
-    %set the basis level to all-zeros
-    L(:,:,zidx,:,:,:) = 0;
-    
-    %unwrap
-    L = unwrap(L,[],3);
-    
-    %shift so it's zero at the basis level
-    Centre = L(:,:,zidx,:,:,:);
-    for iLevel=1:1:numel(Airs.ret_z);
-      L(:,:,iLevel,:,:,:) = L(:,:,iLevel,:,:,:) - Centre;
-    end
-    
-    %and convert back to wavelength
-    L = dZ .* L/(2*pi);
-% %     for iLevel=1:1:numel(Airs.ret_z);
-% %        dZ = Airs.ret_z(iLevel) - Settings.BasisLevel;
-% %        L(:,:,iLevel,:,:,:) = dZ./L(:,:,iLevel,:,:,:);
-% %     end
-    
-    %done! return to the pile
-    Store.L(:,:,:,:,iStep,:) = L;   
-  end
-end
-clear L iLevel Centre dZ iStep
+% % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % % %% phase unwrapping
+% % % %only implemented for base-level relative, as:
+% % % %(i) it's hard to do for the others
+% % % %(ii) they're over short ranges so should be fine anyway
+% % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % % 
+% % % 
+% % % for iStep=1:1:numel(Settings.Steps)  
+% % %   if Settings.Steps(iStep) == 0;
+% % %     
+% % %     %pull out L
+% % %     L = Store.L(:,:,:,:,iStep,:);
+% % % 
+% % %     %convert back to phases
+% % %     sz = size(L);
+% % %     dZ = permute(Airs.ret_z - Airs.ret_z(zidx),[2,3,1,4,5,6]);
+% % %     dZ = repmat(dZ,sz(1),sz(2),1,sz(4),sz(5),sz(6));
+% % %     L = L./dZ./(2*pi);
+% % % 
+% % %     %set the basis level to all-zeros
+% % %     L(:,:,zidx,:,:,:) = 0;
+% % %     
+% % %     %unwrap
+% % %     L = unwrap(L,[],3);
+% % %     
+% % %     %shift so it's zero at the basis level
+% % %     Centre = L(:,:,zidx,:,:,:);
+% % %     for iLevel=1:1:numel(Airs.ret_z);
+% % %       L(:,:,iLevel,:,:,:) = L(:,:,iLevel,:,:,:) - Centre;
+% % %     end
+% % %     
+% % %     %and convert back to wavelength
+% % %     L = dZ .* L/(2*pi);
+% % % % %     for iLevel=1:1:numel(Airs.ret_z);
+% % % % %        dZ = Airs.ret_z(iLevel) - Settings.BasisLevel;
+% % % % %        L(:,:,iLevel,:,:,:) = dZ./L(:,:,iLevel,:,:,:);
+% % % % %     end
+% % %     
+% % %     %done! return to the pile
+% % %     Store.L(:,:,:,:,iStep,:) = L;   
+% % %   end
+% % % end
+% % % clear L iLevel Centre dZ iStep
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3dst?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-ST3D = gwanalyse_airs_3d(Airs);
+ST3D = gwanalyse_airs_3d(Airs,'TwoDPlusOne',true);
+
+%make dupe copy (w/uw) for comparison
+Store.A2 =    repmat(permute(ST3D.A_2dp1,[1,2,3,6,4,5]),[1,1,1,2,1,1]);
+Store.L2 = 1./repmat(permute(ST3D.m_2dp1,[1,2,3,6,4,5]),[1,1,1,2,1,1]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% done. save.
@@ -346,4 +350,4 @@ dd = date2doy(Settings.Day);
 OutFile = ['stout_',sprintf('%04d',yy),'d',sprintf('%03d',dd),'g',sprintf('%03d',Settings.GiD),'_thin',num2str(Settings.Thin),'.mat']
 
 
-save(OutFile,'Store','Settings','Airs','ST3D')
+save(OutFile,'Settings','Airs','ST3D','Store','-v7.3')
