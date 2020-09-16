@@ -2,7 +2,7 @@ clearvars
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% figure showing the 2D+1 analysis for four waves as 2D cuts
+%% figure showing the 2D+1 analysis for four waves as 1D lines
 %
 % Corwin Wright, c.wright@bath.ac.uk, 2020/08/24
 %
@@ -17,10 +17,8 @@ clearvars
 Cases.Case1 = {datenum(2008,1,127),[57],30,45};
 Cases.Case2 = {datenum(2007,1,13),[122],80,55};
 Cases.Case3 = {datenum(2005,7,8),[85,86],110,25};
-Cases.Case4 = Cases.Case1; %placeholder
+% Cases.Case4 = Cases.Case1; %placeholder
 
-%how many elements to plot each side of wave centre
-Settings.Length = 35;
 
 %letters for labelling
 Letters = 'abcdefghijklmnopqrstuvwxyz'; lettercount = 0;
@@ -35,7 +33,7 @@ set(gcf,'color','w')
 subplot = @(m,n,p) subtightplot (m, n, p, [0.018 0.005], [0.07,0.05], 0.05);
 
 
-for iCase=1:1:numel(fieldnames(Cases))
+for iCase=1:1:3%numel(fieldnames(Cases))
   
   %% load data
   %%%%%%%%%%%%%%%%%%%%%%
@@ -50,16 +48,16 @@ for iCase=1:1:numel(fieldnames(Cases))
     [Airs,Spacing] = prep_airs_3d(Case{1},Granules(iGranule),'PreSmooth',[3,3,1]);
     
     %3D S-Transform the granule
-    ST = gwanalyse_airs_3d(Airs,'ZRange',[15 65],'TwoDPlusOne',true);
+    ST = gwanalyse_airs_3d(Airs,'ZRange',[0 90],'TwoDPlusOne',true);
 
     %store granule
     Airs = rmfield(Airs,{'ret_temp','MetaData','Source'}); 
     Airs.Lz  = 1./ST.m;      Airs.A  = ST.A;
     Airs.Lz2 = 1./ST.m_2dp1; Airs.A2 = ST.A_2dp1;     
 
-    %smooth vertically
-%     Airs.Lz  = smoothn(Airs.Lz, [3,3,3]);
-%     Airs.Lz2 = smoothn(Airs.Lz2,[1,1,3]);
+% % %     %smooth vertically
+% % %     Airs.Lz  = smoothn(Airs.Lz, [1,1,5]);
+% %     Airs.Lz2 = smoothn(Airs.Lz2,[1,1,3]);
     
     if iGranule == 1; Data = Airs; 
     else Data = cat_struct(Data,Airs,2,{'ret_z'});
@@ -67,10 +65,8 @@ for iCase=1:1:numel(fieldnames(Cases))
   end
   
   %ipull out the bit we want
-  x = (-Settings.Length:1:Settings.Length) + Case{3};
-  if min(x) <0; x = x - min(x) +1; end
-  y = (-Settings.Length:1:Settings.Length) + Case{4};
-  if min(y) <0; y = y - min(y) +1; end
+  x = Case{3};
+  y = Case{4};
   
   Data.l1_lat  = Data.l1_lat( y,x,:);
   Data.l1_lon  = Data.l1_lon( y,x,:);
@@ -78,8 +74,8 @@ for iCase=1:1:numel(fieldnames(Cases))
   Data.Tp      = Data.Tp(     y,x,:);
   Data.BG      = Data.BG(     y,x,:);
   Data.A       = Data.A(      y,x,:);
-  Data.Lz      = Data.Lz(     y,x,:);
   Data.A2      = Data.A2(     y,x,:);
+  Data.Lz      = Data.Lz(     y,x,:);
   Data.Lz2     = Data.Lz2(    y,x,:);
   
   clear iGranule Granules Airs
@@ -96,70 +92,52 @@ for iCase=1:1:numel(fieldnames(Cases))
     %get data and set settings
     switch iPlot
       case 1;
-        ToPlot = squeeze(Data.Tp(:,Settings.Length+1,:))'; %at T'
+        ToPlot = squeeze(Data.Tp)'; %at T'
         Colours = flipud(cbrewer('div','RdBu',33));
         Range = [-1,1].*8;
-% %       case 2; 
-% %         ToPlot = squeeze(Data.Tp(Settings.Length+1,:,:))'; %xt T'
-% %         Colours = flipud(cbrewer('div','RdBu',33));
-% %         Range = [-1,1].*8;
       case 2; 
-        ToPlot = squeeze(Data.A( :,Settings.Length+1,:))'; %at A
-        Colours = cbrewer('seq','Greens',33);
+        ToPlot = squeeze(Data.A)'; %at A
         Range = [0 10];
       case 3;
-        ToPlot = squeeze(Data.Lz(:,Settings.Length+1,:))'; %at Lz 
-        Colours = cbrewer('seq','Blues',33);
-        Range = [15 35];
+        ToPlot = squeeze(Data.Lz)'; %at Lz 
+        Range = [0 50];
       case 4; 
-        ToPlot = squeeze(Data.A2( :,Settings.Length+1,:))'; %at A
-        Colours = cbrewer('seq','Greens',33);
+        ToPlot = squeeze(Data.A2)'; %at A
         Range = [0 3];
       case 5;
-        ToPlot = abs(squeeze(Data.Lz2(:,Settings.Length+1,:)))'; %at Lz
-        Colours = cbrewer('seq','Blues',33);
-        Range = [15 35];
+        ToPlot = abs(squeeze(Data.Lz2))'; %at Lz
+        Range = [0 50];
     end
-    
 
-    %prepare x-axis
-%     if iPlot == 2; xp = (-Settings.Length:1:Settings.Length).*Spacing(2);
-%     else
-      xp = (-Settings.Length:1:Settings.Length).*Spacing(1);
-%     end
-   
     %plot
-%     contourf(xp,Data.ret_z,ToPlot,linspace(Range(1),Range(2),16),'edgecolor','none')
-    imagesc(xp,Data.ret_z,ToPlot); hold on
+    plot(ToPlot,Data.ret_z); hold on
     
     %tidy
-    colormap(h,Colours)
-    set(gca,'ydir','normal')
-    caxis(Range)
+    xlim(Range)
     ylim([20 60])
   
-    %labelling
-    if iCase ==max(numel(fieldnames(Cases))); 
-%       if iPlot ~= 2; xlabel('AT Distance [km]')
-%     else
-      xlabel('XT Distance [km]')
-%       end
-    end
-    if iCase ==1;
-      switch iPlot
-        case 1; title('AT T''');
-%         case 2; title('XT T''')
-        case 2; title('3DST A')
-        case 3; title('3DST \lambda z')
-      end
-    end
-    if iPlot == 1; ylabel('Altitude [km]'); end
-    if iPlot ~= 1; set(gca,'yticklabel',{});end
-    if iCase ~= max(numel(fieldnames(Cases))); set(gca,'xticklabel',{});end;
+% % %     %labelling
+% % %     if iCase ==max(numel(fieldnames(Cases))); 
+% % % %       if iPlot ~= 2; xlabel('AT Distance [km]')
+% % % %     else
+% % %       xlabel('XT Distance [km]')
+% % % %       end
+% % %     end
+% % %     if iCase ==1;
+% % %       switch iPlot
+% % %         case 1; title('AT T''');
+% % % %         case 2; title('XT T''')
+% % %         case 2; title('3DST A')
+% % %         case 3; title('3DST \lambda z')
+% % %       end
+% % %     end
+% % %     if iPlot == 1; ylabel('Altitude [km]'); end
+% % %     if iPlot ~= 1; set(gca,'yticklabel',{});end
+% % %     if iCase ~= max(numel(fieldnames(Cases))); set(gca,'xticklabel',{});end;
     
     %lettering
     lettercount = lettercount+1;
-    text(xp(1),24,['(',Letters(lettercount),')'],'fontweight','bold','fontsize',18)
+%     text(xp(1),24,['(',Letters(lettercount),')'],'fontweight','bold','fontsize',18)
     
     %done!
     drawnow

@@ -14,13 +14,13 @@ clearvars
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %cases to plot: {Date,Granules,XT row, AT row}
-Cases.Case1 = {datenum(2008,1,127),[57],30,45};
-Cases.Case2 = {datenum(2007,1,13),[122],80,55};
-Cases.Case3 = {datenum(2005,7,8),[85,86],110,25};
-Cases.Case4 = Cases.Case1; %placeholder
+Cases.Case1 = {datenum(2008,1,127),1,67,45}; %we're using this one to get background, but the wave will be fake
 
 %how many elements to plot each side of wave centre
 Settings.Length = 35;
+
+%flat-field or real noise?
+Settings.Flat = 0;
 
 %letters for labelling
 Letters = 'abcdefghijklmnopqrstuvwxyz'; lettercount = 0;
@@ -48,6 +48,66 @@ for iCase=1:1:numel(fieldnames(Cases))
     
     %load granule
     [Airs,Spacing] = prep_airs_3d(Case{1},Granules(iGranule),'PreSmooth',[3,3,1]);
+    
+    %keep only geolocation and zeros otherwise?
+    if Settings.Flat == 1; Airs.Tp(:) = 0; end
+    
+    %make the fake wave
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    %create a sinusoid packet going in 1d over a few levels
+    %parameters - wave
+    Amplitude  =           5; %K
+    Lambda.x   =         600; %km - along track
+    Lambda.y   =        1000; %km - across track
+    Lambda.z   =          25; %km
+    Rotation   =  [0,0,0];%[30,30,30]; %degrees in x,y,z
+    
+    dx = Spacing(1); dy = Spacing(2); dz = 3;
+    
+    kx = (2*pi)./(Lambda.x./dx); 
+    ky = (2*pi)./(Lambda.y./dy);     
+    kz = (2*pi)./(Lambda.z./dz);
+    
+    %parameters - packets (values are fwhm of a gaussian, centred at granule centre)
+    Width.x =  500;
+    Width.y = 1000;
+    Width.z =   40;
+    
+    %make wave
+    [x,y,z] = ndgrid(1:1:500,1:1:500,1:1:200); %will trim to size later                   
+                   
+    wave = Amplitude .* sin(kx.*x + ky.*y + kz.*z);
+
+    %rotate wave
+    wave = imrotate(wave,Rotation(1),'bilinear','crop'); %axis 1
+    wave = permute(imrotate(permute(wave,[2,1,3]),Rotation(2),'bilinear','crop'),[2,1,3]); %axis 2
+    wave = permute(imrotate(permute(wave,[1,3,2]),Rotation(2),'bilinear','crop'),[1,3,2]); %axis 3
+    
+    %trim to size, taking the middle bit only (this avoids bits rotated off the edges)
+    wave = wave((1:1:size(Airs.l1_lat,1)) - floor(mean(size(Airs.l1_lat,1))./2) + 250,...
+                (1:1:size(Airs.l1_lat,2)) - floor(mean(size(Airs.l1_lat,2))./2) + 250,...
+                (1:1:size(Airs.ret_z, 1)) - floor(mean(size(Airs.ret_z, 1))./2) + 100);
+
+    
+    %packetise
+    gauss = @(x,mu,sig,amp,vo)amp*exp(-(((x-mu).^2)/(2*sig.^2)))+vo;   
+    Gauss.x = gauss(1:1:size(Airs.l1_lat,1),size(Airs.l1_lat,1)./2,Width.x./dx./2.355,1,0);
+    Gauss.y = gauss(1:1:size(Airs.l1_lat,2),size(Airs.l1_lat,2)./2,Width.y./dy./2.355,1,0);
+    Gauss.z = gauss(1:1:size(Airs.ret_z, 1),size( Airs.ret_z,1)./2,Width.z./dz./2.355,1,0);
+    [Gx,Gy,Gz] = ndgrid(Gauss.x,Gauss.y,Gauss.z); G = Gx.*Gy.*Gz;
+    Wave = wave.*G;
+    
+    %add to the data]
+    Airs.Tp = Airs.Tp + Wave;
+
+    %tidy
+    clear Amplitude Lambda dx kx ky kz Width x y z wave gauss Gx Gy Gz G Rotation
+
+   
+    
+    %analyse the wave
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     %3D S-Transform the granule
     ST = gwanalyse_airs_3d(Airs,'ZRange',[15 65],'TwoDPlusOne',true);
@@ -162,6 +222,7 @@ for iCase=1:1:numel(fieldnames(Cases))
     text(xp(1),24,['(',Letters(lettercount),')'],'fontweight','bold','fontsize',18)
     
     %done!
+    colorbar
     drawnow
   end
   clear iPlot x xo y ToPlot

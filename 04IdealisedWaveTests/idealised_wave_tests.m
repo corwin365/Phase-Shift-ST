@@ -13,7 +13,7 @@ clearvars
 %% settings
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Settings.NLevels = 18;%100;%5:1:10;
+Settings.NLevels = 100;%5:1:10;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,7 +37,7 @@ for iResolution = 1:1:numel(Settings.NLevels)
   z = linspace(-100,100,Settings.NLevels(iResolution));
   W = reshape(Workspace.Workspace.Wavefield,201*201,201);
   W = reshape(interp1(Field.ret_z,W',z,'spline')',201,201,numel(z));
-  Field.ret_z = z; 
+  Field.ret_z = z'; 
 
   %and create data fields
   Field.Tp       = W;
@@ -49,14 +49,13 @@ for iResolution = 1:1:numel(Settings.NLevels)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %% apply 3DST and both 2D+1 ST versions
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
+
   [ST3D,~] = gwanalyse_airs_3d(Field,                       ...
-                                  'NotAirsData',    true,       ...
-                                  'HeightScaling',  false,      ...
-                                  'ZRange',         [-100,100], ...
-                                  'Spacing',        [1,1,1],    ...
-                                  'TwoDPlusOne',    true,      ...
-                                  'TwoDPlusOne_ind',false);
+                               'NotAirsData',    true,       ...
+                               'HeightScaling',  false,      ...
+                               'ZRange',         [-100,100], ...
+                               'Spacing',        [1,1,1],    ...
+                               'TwoDPlusOne',    true);
                                 
 
 end
