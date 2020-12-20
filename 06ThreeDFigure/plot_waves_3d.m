@@ -51,6 +51,8 @@ for iWave = 2%1:1:3
       stop
   end
   
+  
+  stop
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%reformat for isosurface plotting
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

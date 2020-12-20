@@ -20,7 +20,7 @@ Cases.Case1 = {datenum(2008,1,127),1,67,45}; %we're using this one to get backgr
 Settings.Length = 35;
 
 %flat-field or real noise?
-Settings.Flat = 0;
+Settings.Flat = 1;
 
 %letters for labelling
 Letters = 'abcdefghijklmnopqrstuvwxyz'; lettercount = 0;
@@ -110,7 +110,8 @@ for iCase=1:1:numel(fieldnames(Cases))
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     %3D S-Transform the granule
-    ST = gwanalyse_airs_3d(Airs,'ZRange',[15 65],'TwoDPlusOne',true);
+    ST = gwanalyse_airs_3d(Airs,'ZRange',[0 90],'TwoDPlusOne',true);
+   
 
     %store granule
     Airs = rmfield(Airs,{'ret_temp','MetaData','Source'}); 

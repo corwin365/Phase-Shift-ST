@@ -13,7 +13,7 @@ clearvars
 %% settings
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-InFile = 'stout_2007d013g122_thin1.mat';
+InFile = 'stout_2008d127g056_thin1.mat';
 
 
 Peak = 1; %which peak in the data (1 = largest)

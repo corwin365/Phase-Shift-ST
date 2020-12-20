@@ -147,7 +147,7 @@ for iCombo = 1:1:size(ComboData,1);
     
     
     %3D S-Transform the granule
-    ST = gwanalyse_airs_3d(Airs,'ZRange',[15 65],'TwoDPlusOne',true,'TwoDPlusOneSettings',TwoDSettings);
+    ST = gwanalyse_airs_3d(Airs,'ZRange',[0 90],'TwoDPlusOne',true,'TwoDPlusOneSettings',TwoDSettings);
     
     %store granule
     Airs = rmfield(Airs,{'ret_temp','MetaData','Source'});
