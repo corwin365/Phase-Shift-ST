@@ -6,7 +6,7 @@ clearvars
 %2. height-weighting does make some difference - test when other settings pinned
 %3. a step of 2 is better than a step of 3
 %4. c1 = 1 and c2 = 0.25 works pretty well.
-%5. thresholds above zero lose the short waves
+%5. thresholds above zero lose the short-vertical waves
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

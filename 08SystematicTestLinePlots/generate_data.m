@@ -15,6 +15,9 @@ clearvars
 %output file
 Settings.OutFile = 'out_testing2.mat';
 
+%cutoff wavelengths
+Settings.CutOff.kz = 200;
+
 
 %background field to use: {Date,Granules,XT row, AT row}
 %will be loaded regardless, but set to zero for flat-field analyses
@@ -23,8 +26,8 @@ Settings.OutFile = 'out_testing2.mat';
 Settings.Case = {datenum(2008,1,127),1}; 
 
 %portion of the granule to average the result over
-Settings.AvZone.X = (-15:1:15)+45;
-Settings.AvZone.Y = (-15:1:15)+67;
+Settings.AvZone.X = (-25:1:25)+45;
+Settings.AvZone.Y = (-25:1:25)+67;
 Settings.AvZone.Z = ( -3:1: 3)+14;
 Settings.Averages = {'nanmean','nanmedian','mode'};
 
@@ -33,16 +36,16 @@ Settings.Averages = {'nanmean','nanmedian','mode'};
 %the one used while other variables are varied. Duplicates will be removed
 %so don't worry about putting the default in twice.
 Settings.Wave.Amplitude = 10;%[5,0.25:0.25:10];  %unique([5,1:1:5],'stable'); %K
-Settings.Wave.Lambdax   = [100:100:1000];  %km - across track
-Settings.Wave.Lambday   = 10000;%[1000,50:50:1500]; %km - along track
-Settings.Wave.Lambdaz   = 60;%[10:10:80];%[25,2.5:2.5:100];  %km
+Settings.Wave.Lambdax   = 400;%[30:5:100,150:50:400,500:100:1000];%[100:100:1000];  %km - across track
+Settings.Wave.Lambday   = 400;%[1000,50:50:1500]; %km - along track
+Settings.Wave.Lambdaz   = 2:2:100;%[25,2.5:2.5:100];  %km
 Settings.Wave.Rotationx = 0;%[0:10:170];        %degrees in x to rotate wave
 Settings.Wave.Rotationy = 0;%[0:10:170];        %degrees in y to rotate wave
-Settings.Wave.Rotationz = 0;%[0:10:170];        %degrees in z to rotate wave
+Settings.Wave.Rotationz = 30;%[0:10:170];        %degrees in z to rotate wave
 
-Settings.Wave.PacketWidthx =    500;  %km width of packet in xt dir
-Settings.Wave.PacketWidthy =   1000; %km width of packet in at dir
-Settings.Wave.PacketWidthz =     40; %km width of packet in z dir
+Settings.Wave.PacketWidthx =    600;  %km width of packet in xt dir
+Settings.Wave.PacketWidthy =    600; %km width of packet in at dir
+Settings.Wave.PacketWidthz =     50; %km width of packet in z dir
 
 %variable to retain for later analysis
 Settings.OutVars = {'A','m','kh','th'};
@@ -166,7 +169,7 @@ for iVar=1:1:numel(Vars)
     for Flat=[1,2];
 
       %generate field
-      if Flat == 1; Airs.Tp = Airs.Tp + Wave; disp('===> Real noise');
+      if Flat == 1; Airs.Tp = Airs.Tp.*0.1 + Wave; disp('===> Real noise');
       else          Airs.Tp = Wave;           disp('===> Flat-field');
       end
 
@@ -176,6 +179,10 @@ for iVar=1:1:numel(Vars)
       %do 3DST and 2D+1 ST
       ST = gwanalyse_airs_3d(Airs,'ZRange',[0 90],'TwoDPlusOne',true,'HeightScaling',false);
 
+      %drop points with excessive vertical wavelengths
+      %(actually done in the loop below, this is just identification)
+      Bad = find(1./ST.m_2dp1 > Settings.CutOff.kz);
+      
       %convert F1 and F2 to kx and th
       ST.kh      = quadadd(ST.F1,ST.F2); 
       ST.th      = atan2d(ST.F2,ST.F1);
@@ -188,6 +195,9 @@ for iVar=1:1:numel(Vars)
         fh = str2func(Settings.Averages{iAverage});
         VarA = ST.(Settings.OutVars{iOutVar});
         VarB = ST.([Settings.OutVars{iOutVar},'_2dp1']);
+        
+        VarA(Bad) = NaN;
+        VarB(Bad) = NaN;
 
         Results(Flat,1,iOutVar,iAverage,iRun) = abs(fh(VarA(Settings.AvZone.X, ...
                                                             Settings.AvZone.Y, ...
