@@ -73,6 +73,8 @@ for iVar=1:1:numel(Variables)
     %pull out data to plot
     ToPlot = squeeze(Output(:,:,jVar,Settings.AvType,:));
     
+    if strcmp(PlotVars{jVar},'F3'); ToPlot = 1./ToPlot; end
+    
     %if the data is a wavenumber, flip it
     if any(strcmp(PlotVars{jVar},{'kh','m'})); ToPlot = 1./ToPlot; end
        
@@ -86,8 +88,16 @@ for iVar=1:1:numel(Variables)
     box on
     
     %label them
-    xlabel(VarName)
-    ylabel(PlotVars{jVar})
+    xlabel(['IN ',VarName])
+    
+    
+    if     strcmp(PlotVars{jVar},'F3'); ylabel(['OUT ','LambdaZ'])
+    elseif strcmp(PlotVars{jVar},'kh'); ylabel(['OUT ','LambdaH'])  
+    elseif strcmp(PlotVars{jVar},'th'); ylabel(['OUT ','Wave Angle'])      
+    else                            ylabel(['OUT ',PlotVars{jVar}])
+    end
+    
+    
     
     %plot data
     plot(XScale,squeeze(ToPlot(1,1,:)), ...
