@@ -25,7 +25,7 @@ Settings.AvZone.Z = ( -3:1: 3)+14;
 Settings.Averages = {'nanmean','nanmedian','mode'};
 
 %variables defining the wave we will create
-Settings.Wave.Amplitude    =   20;
+Settings.Wave.Amplitude    =   10;
 Settings.Wave.Lambdax      =  500;
 Settings.Wave.Lambday      = 1000;
 Settings.Wave.Lambdaz      =   25;
@@ -38,6 +38,10 @@ Settings.Wave.PacketWidthz =   50; %km width of packet in z dir
 
 %function to create gaussian packet envelope
 gauss = @(x,mu,sig,amp,vo)amp*exp(-(((x-mu).^2)/(2*sig.^2)))+vo;
+
+%variables to plot, and the colour levels to show
+Settings.PlotVars   = {'Wave','A_2dp1'};
+Settings.ColourLevs = {[5],[5]}; %both negative and positve values will be shown
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% load the granule we'll be basing this on
@@ -88,6 +92,14 @@ clear x y z kx ky kz wave Gx Gy Gz
 clear G gauss Gauss Params
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ST the wave, so we can plot output examples
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Airs.Tp = Wave;
+ST = gwanalyse_airs_3d(Airs,'ZRange',[0 90],'TwoDPlusOne',true,'Spacing',Spacing);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% make location matrices
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -105,99 +117,119 @@ sz = size(Wave);
 %% plot!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%prepare figure
-clf
-set(gcf,'color','w')
-
-
-
-hold on
-
-%overinterpolate the wave
-%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Oversample = 7;
-[xi,yi,zi] =  meshgrid(1:1./Oversample:sz(2),1:1./Oversample:sz(1),1:1./Oversample:sz(3));
-Wave2 = interp3(x,y,z,Wave,xi,yi,zi);
-Wave2 = smoothn(Wave2,[9,9,9]);
-
-%scale to size of Airs granule
-xi = xi.*Spacing(1);
-yi = yi.*Spacing(2);
-zi = zi.*Spacing(3);
-
-%plot isosurfaces
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-IsoSurfaces= 5;
-Alphas = ones(size(IsoSurfaces)).*0.5;
-
-for iMode=1:1:2;
+for iPlotVar= 2%1:1:numel(Settings.PlotVars)
   
-  if iMode == 1; %positive
-    Colours = flipud(cbrewer('seq','Reds',numel(IsoSurfaces).*2));
-  elseif iMode == 2; %negative
-    Colours = flipud(cbrewer('seq','Blues',numel(IsoSurfaces).*2));
-    IsoSurfaces = -1.*IsoSurfaces;
+  
+  %prepare figure
+  clf
+  set(gcf,'color','w')
+  
+  
+  
+  hold on
+  
+  %get variable
+  %%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  switch Settings.PlotVars{iPlotVar}
+    case 'Wave';    PlotData = Wave;
+    case 'A_2dp1';  PlotData = ST.A_2dp1;
   end
   
-  for iIso=1:1:numel(IsoSurfaces);
-    %create unique ID for patch
-    PatchId = ['Patch',num2str(iIso+iMode.*100)];
+  
+  %overinterpolate the wave
+  %%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  Oversample = 7;
+  [xi,yi,zi] =  meshgrid(1:1./Oversample:sz(2),1:1./Oversample:sz(1),1:1./Oversample:sz(3));
+  Wave2 = interp3(x,y,z,PlotData,xi,yi,zi);
+  Wave2 = smoothn(Wave2,[9,9,9]);
+  
+  %scale to size of Airs granule
+  xi = xi.*Spacing(1);
+  yi = yi.*Spacing(2);
+  zi = zi.*Spacing(3);
+  
+  %fill edges with zeros, to avoid truncated volumes
+  Wave2([1,end],:,:) = NaN;
+  Wave2(:,[1,end],:) = NaN;
+  Wave2(:,:,[1,end]) = NaN;  
+  
+  %plot isosurfaces
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  
+  IsoSurfaces= Settings.ColourLevs{iPlotVar};
+  Alphas = ones(size(IsoSurfaces)).*0.5;
+  
+  for iMode=1:1:2;
     
-    %produce patch
-    fv = isosurface(xi,yi,zi,Wave2,IsoSurfaces(iIso));
-    eval([PatchId,' = patch(fv);'])
+    if iMode == 1; %positive
+      Colours = flipud(cbrewer('seq','Reds',numel(IsoSurfaces).*2));
+    elseif iMode == 2; %negative
+      Colours = flipud(cbrewer('seq','Blues',numel(IsoSurfaces).*2));
+      IsoSurfaces = -1.*IsoSurfaces;
+    end
     
-    % plot as transparent surfaces
-    eval([PatchId,'.FaceColor = Colours(iIso,:);']); %
-    eval([PatchId,'.EdgeColor = ''none'';']);
-    eval([PatchId,'.FaceAlpha  = Alphas(iIso);']);
+    for iIso=1:1:numel(IsoSurfaces);
+      %create unique ID for patch
+      PatchId = ['Patch',num2str(iIso+iMode.*100)];
+      
+      %produce patch
+      fv = isosurface(xi,yi,zi,Wave2,IsoSurfaces(iIso));
+      eval([PatchId,' = patch(fv);'])
+      
+      % plot as transparent surfaces
+      eval([PatchId,'.FaceColor = Colours(iIso,:);']); %
+      eval([PatchId,'.EdgeColor = ''none'';']);
+      eval([PatchId,'.FaceAlpha  = Alphas(iIso);']);
+      
+      %fix reflection
+      eval(['set(',PatchId,',''DiffuseStrength'',1,''SpecularStrength'',0.5,''SpecularExponent'',15)']);
+      
+      %done
+      eval(['clear ',PatchId,';'])
+      
+      drawnow
+    end
     
-    %fix reflection
-    eval(['set(',PatchId,',''DiffuseStrength'',1,''SpecularStrength'',0.5,''SpecularExponent'',15)']);
-    
-    %done
-    eval(['clear ',PatchId,';'])
-    
-    drawnow
   end
   
+  
+  
+  %plot averaging cage
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  Cage = Settings.AvZone;
+  Colour = [1,1,1]*0;
+  LineStyle = '-';
+  hold on
+  
+  Cage.X = Cage.X.*Spacing(1);
+  Cage.Y = Cage.Y.*Spacing(2);
+  Cage.Z = Cage.Z.*Spacing(3);
+  
+  plot3(Cage.Y([1,end,end,1,1]),Cage.X([  1,  1,end,end,  1]),Cage.Z([  1,  1,  1,  1,  1]),LineStyle,'color',Colour,'linewi',3)
+  plot3(Cage.Y([1,end,end,1,1]),Cage.X([end,end,end,end,end]),Cage.Z([  1,  1,end,end,  1]),LineStyle,'color',Colour,'linewi',3)
+  plot3(Cage.Y([1,end,end,1,1]),Cage.X([  1,  1,  1,  1,  1]),Cage.Z([  1,  1,end,end,  1]),LineStyle,'color',Colour,'linewi',3)
+  plot3(Cage.Y([1,end,end,1,1]),Cage.X([  1,  1,end,end,  1]),Cage.Z([end,end,end,end,end]),LineStyle,'color',Colour,'linewi',3)
+  
+  
+  %tidy up
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  xlabel('x')
+  ylabel('y')
+  zlabel('z')
+  
+  % axis([-5 135 -5 90 -5 31] + [20 -20 10 -10 3 -3])
+  
+  camlight
+  lighting gouraud
+  view([40,20])
+  axis square
+  grid on
+  % set(gca,'Projection','perspective')
+  
+  stpp
 end
-
-
-
-%% plot averaging cage
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Cage = Settings.AvZone;
-Colour = [1,1,1]*0;
-LineStyle = '-';
-hold on
-
-Cage.X = Cage.X.*Spacing(1);
-Cage.Y = Cage.Y.*Spacing(2);
-Cage.Z = Cage.Z.*Spacing(3);
-
-plot3(Cage.Y([1,end,end,1,1]),Cage.X([  1,  1,end,end,  1]),Cage.Z([  1,  1,  1,  1,  1]),LineStyle,'color',Colour,'linewi',3)
-plot3(Cage.Y([1,end,end,1,1]),Cage.X([end,end,end,end,end]),Cage.Z([  1,  1,end,end,  1]),LineStyle,'color',Colour,'linewi',3)
-plot3(Cage.Y([1,end,end,1,1]),Cage.X([  1,  1,  1,  1,  1]),Cage.Z([  1,  1,end,end,  1]),LineStyle,'color',Colour,'linewi',3)
-plot3(Cage.Y([1,end,end,1,1]),Cage.X([  1,  1,end,end,  1]),Cage.Z([end,end,end,end,end]),LineStyle,'color',Colour,'linewi',3)
-
-
-%% tidy up
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-xlabel('x')
-ylabel('y')
-zlabel('z')
-
-% axis([-5 135 -5 90 -5 31] + [20 -20 10 -10 3 -3])
-
-camlight
-lighting gouraud
-view([40,20])
-axis square
-grid on
-% set(gca,'Projection','perspective')
