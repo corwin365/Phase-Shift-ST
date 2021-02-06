@@ -25,7 +25,7 @@ Settings.AvZone.Z = ( -3:1: 3)+14;
 Settings.Averages = {'nanmean','nanmedian','mode'};
 
 %variables defining the wave we will create
-Settings.Wave.Amplitude    =   10;
+Settings.Wave.Amplitude    =   25;
 Settings.Wave.Lambdax      =  500;
 Settings.Wave.Lambday      = 1000;
 Settings.Wave.Lambdaz      =   25;
@@ -40,8 +40,8 @@ Settings.Wave.PacketWidthz =   50; %km width of packet in z dir
 gauss = @(x,mu,sig,amp,vo)amp*exp(-(((x-mu).^2)/(2*sig.^2)))+vo;
 
 %variables to plot, and the colour levels to show
-Settings.PlotVars   = {'Wave','A_2dp1'};
-Settings.ColourLevs = {[5],[5]}; %both negative and positve values will be shown
+Settings.PlotVars   = {'Wave'};%,'A_2dp1'};
+Settings.ColourLevs = {[2],[5]}; %both negative and positve values will be shown
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% load the granule we'll be basing this on
@@ -117,7 +117,7 @@ sz = size(Wave);
 %% plot!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-for iPlotVar= 2%1:1:numel(Settings.PlotVars)
+for iPlotVar= 1%1:1:numel(Settings.PlotVars)
   
   
   %prepare figure
@@ -140,7 +140,7 @@ for iPlotVar= 2%1:1:numel(Settings.PlotVars)
   %overinterpolate the wave
   %%%%%%%%%%%%%%%%%%%%%%%%%
   
-  Oversample = 7;
+  Oversample = 3;
   [xi,yi,zi] =  meshgrid(1:1./Oversample:sz(2),1:1./Oversample:sz(1),1:1./Oversample:sz(3));
   Wave2 = interp3(x,y,z,PlotData,xi,yi,zi);
   Wave2 = smoothn(Wave2,[9,9,9]);
@@ -224,7 +224,7 @@ for iPlotVar= 2%1:1:numel(Settings.PlotVars)
   
   % axis([-5 135 -5 90 -5 31] + [20 -20 10 -10 3 -3])
   
-  camlight
+%   camlight
   lighting gouraud
   view([40,20])
   axis square

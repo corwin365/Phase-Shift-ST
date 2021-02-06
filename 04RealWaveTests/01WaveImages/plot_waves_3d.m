@@ -3,7 +3,7 @@ clf
 set(gcf,'color','w')
 set(gca,'fontsize',16)
 
-for iWave = 2%1:1:3
+for iWave = 1%1:1:3
 
   
   set(gcf,'position',[329.4,121.8,868,640]) %for size consistency
@@ -15,11 +15,12 @@ for iWave = 2%1:1:3
     case 1; 
       %Andes big 2008
       Airs = prep_airs_3d(datenum(2008,1,127),57);
+% %       Airs = prep_airs_3d(datenum(2019,7,26),55);      
       LatRange    = [-61,-41];
       LonRange    = [-80,-57];
       HeightRange = [20,60];
       ViewAngle   = [-36,28];
-      IsoSurfaces = 4.5;%4:1:10;
+      IsoSurfaces = 3.5;%4:1:10;
       Alphas      = 0.9;%ones(size(IsoSurfaces)).*0.25;
       SmoothSize  = [5,5,1];   
     case 2;
@@ -52,7 +53,6 @@ for iWave = 2%1:1:3
   end
   
   
-  stop
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %%reformat for isosurface plotting
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -139,7 +139,6 @@ for iWave = 2%1:1:3
     end
     
   end
-  
 
 
   camlight left; camlight  
@@ -150,6 +149,6 @@ for iWave = 2%1:1:3
   drawnow
 
   
-  
+  stop
   clearvars -except iWave
 end
