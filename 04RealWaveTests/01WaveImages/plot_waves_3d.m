@@ -3,7 +3,7 @@ clf
 set(gcf,'color','w')
 set(gca,'fontsize',16)
 
-for iWave = 1%1:1:3
+for iWave = 3%1:1:3
 
   
   set(gcf,'position',[329.4,121.8,868,640]) %for size consistency
@@ -44,7 +44,7 @@ for iWave = 1%1:1:3
       LatRange    = [30,65];
       LonRange    = [-100,-80];
       HeightRange = [30,50];
-      ViewAngle   = [155 50];
+      ViewAngle   = [-21 48];
       IsoSurfaces = 1.5;%4:1:10;
       Alphas      = 0.9;%ones(size(IsoSurfaces)).*0.25;
       SmoothSize  = [3,3,1];             

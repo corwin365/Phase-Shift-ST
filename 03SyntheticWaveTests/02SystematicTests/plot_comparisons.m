@@ -14,7 +14,6 @@ clearvars
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %input file
-% Settings.InFile = 'out_incfrac.mat';
 Settings.InFile = 'out_testing2.mat';
 
 %average type we want to plot
@@ -60,7 +59,7 @@ PlotVars = Data.Settings.OutVars;
 
 
 %remove any input variables we don't want to plot
-ToRemove = {'Rotationy'};%,'Lambday'};
+ToRemove = {'Rotationy'};
 List = [];
 for iVar=1:1:numel(Variables)
   if ~any(strcmp(Variables{iVar},ToRemove));
@@ -90,9 +89,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
-
-
 % % % %find the range of each of the
 % % % %output variables
 % % % Ranges = NaN(2,numel(PlotVars)); Ranges(1,:) = 99e99; Ranges(2,:) = -99e99;
@@ -108,9 +104,10 @@ end
 
 %set manually for final version
 Ranges(:,1) = [0,4.5];
-Ranges(:,2) = [0 100];
-Ranges(:,3) = [100 600];
+Ranges(:,2) = [10 100];
+Ranges(:,3) = [40 600];
 Ranges(:,4) = [0 180];
+
 
 
 
@@ -207,8 +204,25 @@ for iVar=1:1:numel(Variables)
    set(gca,'tickdir','out')
    set(gca,'color',[1,1,1].*0.9)
    set(gca,'TickLength',[1, 1].*0.05);
-   text(0.05.*max(XScale),Ranges(1,jVar)+0.9.*range(Ranges(:,jVar)),['(',Letters(Positions(k)),')'])
-       
+   
+   if strcmp(VarName,'Lambdaz');
+     axis([10 max(XScale) Ranges(:,jVar)']);
+     text(0.05.*max(XScale)+10,Ranges(1,jVar)+0.9.*range(Ranges(:,jVar)),['(',Letters(Positions(k)),')'])
+     set(gca,'xtick',[10,40:30:100])
+   elseif strcmp(VarName,'Lambdax');
+     axis([50 max(XScale) Ranges(:,jVar)']);
+     text(0.05.*max(XScale)+50,Ranges(1,jVar)+0.9.*range(Ranges(:,jVar)),['(',Letters(Positions(k)),')'])
+     set(gca,'xtick',[50,400:300:1000])
+   elseif strcmp(VarName,'Lambday');
+     axis([50 max(XScale) Ranges(:,jVar)']);
+     text(0.05.*max(XScale)+50,Ranges(1,jVar)+0.9.*range(Ranges(:,jVar)),['(',Letters(Positions(k)),')'])
+     set(gca,'xtick',[50,500:500:1500])     
+   else
+     text(0.05.*max(XScale),Ranges(1,jVar)+0.9.*range(Ranges(:,jVar)),['(',Letters(Positions(k)),')'])
+   end
+   
+   
+
   end; clear jVar
   
   
