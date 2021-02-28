@@ -36,3 +36,4 @@ consistent however, and demonstrate that the figures accurately represent the in
 
 
 The data/ directory includes the AIRS granules used as tests - these were produced by Lars Hoffman as described in Hoffman and Alexander (JGR, 2009).
+ 
