@@ -1,7 +1,7 @@
 # Phase-Shift-ST
 2D+1 ST Testing and Study
 
-This is the first release version of the code underlying Wright et al (2021), a manuscript submitted to Atmospheric Measurement Techniques
+This is the first release version of the code underlying Wright et al (2021), a manuscript submitted to Atmospheric Measurement Techniques.
 
 
 For the code to work, you will need to:
@@ -27,9 +27,12 @@ Figures 6-8 are generated using the files "example1.m", "example2.m" and "exampl
 The directory "01GettingItWorking" just contains files I used to test concepts, which are incomplete and are likely to be missing required functions. 
 Ignore these, they are just here for completeness.
 
+
+
 For all figures, manual modification to the layout, including adding contextual lines and rearranging panels into figures, was carried out 
 manually in image-editing software. So the above files will not produce final versions as seen in the paper - the contents should be fully 
 consistent however, and demonstrate that the figures accurately represent the input data and our analysis.
 
-The data/ directory includes the AIRS granules used as tests - these were produced by Lars Hoffman, imagery and shapefile from https://www.naturalearthdata.com/ 
-and NASA, and topography data from the US Geological Survey.
+
+
+The data/ directory includes the AIRS granules used as tests - these were produced by Lars Hoffman as described in Hoffman and Alexander (JGR, 2009). Imagery and shapefile data are from https://www.naturalearthdata.com/ and NASA, and topography data are from the US Geological Survey.
