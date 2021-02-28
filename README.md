@@ -1,7 +1,7 @@
 # Phase-Shift-ST
 2D+1 ST Testing and Study
 
-This is the first release version of the code underlying Wright et al (2021), a manuscript submitted to Atmospheric Measurement Techniques.
+This is the code underlying Wright et al (2021), a manuscript submitted to Atmospheric Measurement Techniques which applies the "2D+1" S-Transform to real and synthetic AIRS data to measure atmospheric gravity waves.
 
 
 For the code to work, you will need to:
