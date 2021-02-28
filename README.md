@@ -23,7 +23,7 @@ Figure 4 is generated using first "03SyntheticWaveTests/02SystematicTests/genera
 
 Figure 5 is generated using "04RealWaveTests/01WaveImages/plot_waves_3d.m"
 
-Figures 6-8 are generated using the files "example1.m", "example2.m" and "example3.m" in "04RealWaveTests/02Analyses"
+Figures 6-8 are generated using the files "results_example1.m", "results_example2.m" and "results_example3.m" in "04RealWaveTests/02Analyses"
 
 
 The directory "01GettingItWorking" just contains files I used to test concepts, which are incomplete and are likely to be missing required functions. 
