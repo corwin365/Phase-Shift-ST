@@ -76,11 +76,11 @@ Plot.Data(:,:,end) = 0;
 %% load geolocation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%load topography
-[Topo,Map,~,~] = topo_etc(LonRange,LatRange,0,0,0,1);
-
-%smooth and vertically scale it a bit
-Topo.elev = smoothn(Topo.elev,[1,1].*3).*2;
+% % % %load topography
+% % % [Topo,Map,~,~] = topo_etc(LonRange,LatRange,0,0,0,1);
+% % % 
+% % % %smooth and vertically scale it a bit
+% % % Topo.elev = smoothn(Topo.elev,[1,1].*3).*2;
 
 
 
@@ -93,11 +93,11 @@ for iPlot=1:1:2;
     %degree -> km conversion, but inverted for height
     %1 degree is about 112km
     Plot.Z    = Plot.Z    ./ 112;
-    Topo.elev = Topo.elev ./112;
+% %     Topo.elev = Topo.elev ./112;
     
     %then scale to the panel
     Plot.Z    = Plot.Z    .*60./range(LonRange);
-    Topo.elev = Topo.elev .*60./range(LonRange);
+% %     Topo.elev = Topo.elev .*60./range(LonRange);
     
     Plot.Data = Plot.Data.*-1; %getting flipped somewhere as is clear from the output - this will "fix" it 
   end
@@ -112,13 +112,13 @@ for iPlot=1:1:2;
   set(gca,'xtick',[-80:10:180],'xticklabel',{'180W','175W','170W','165W','160W','155W','150W','145W','140W','135W','130W','125W','120W','115W','110W','105W','100W','95W','90W','85W','80W','75W','70W','65W','60W','55W','50W','45W','40W','35W','30W','25W','20W','15W','10W','5W','0W','5E','10E','15E','20E','25E','30E','35E','40E','45E','50E','55E','60E','65E','70E','75E','80E','85E','90E','95E','100E','105E','110E','115E','120E','125E','130E','135E','140E','145E','150E','155E','160E','165E','170E','175E','180E'})
   set(gca,'ztick',[0:20:60],   'zticklabel',{'0km','20km','40km','60km'})
   
-  %prepare panel and plot terrain
-  hMap = surface(Topo.lons,Topo.lats,Topo.elev,Map.Map,...
-                 'FaceColor','texturemap','EdgeColor','none','CDataMapping','direct');
-  set(hMap,'clipping','on')
-  
-  %set terrain to not reflect light specularly
-  set(hMap,'DiffuseStrength',1,'SpecularStrength',0)
+% %   %prepare panel and plot terrain
+% %   hMap = surface(Topo.lons,Topo.lats,Topo.elev,Map.Map,...
+% %                  'FaceColor','texturemap','EdgeColor','none','CDataMapping','direct');
+% %   set(hMap,'clipping','on')
+% %   
+% %   %set terrain to not reflect light specularly
+% %   set(hMap,'DiffuseStrength',1,'SpecularStrength',0)
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %% plot data

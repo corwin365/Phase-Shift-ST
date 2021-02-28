@@ -39,7 +39,7 @@ Settings.LLevs(abs(Settings.LLevs) < 1) = [];
 
 for iG=1:1:numel(Settings.Granules)
   
-  Airs = prep_airs_3d(Settings.Date,Settings.Granules(iG));
+  Airs = prep_airs_3d(Settings.Date,Settings.Granules(iG),'FullDataDir','../granules');
   
   if iG == 1;
     Store.Tp    = Airs.Tp;

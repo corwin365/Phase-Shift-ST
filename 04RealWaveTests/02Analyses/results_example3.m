@@ -157,15 +157,15 @@ clear ST
 
 disp('Data overinterpolated and smoothed')
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% load background map and topography
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-[~,Map,~,Coasts] = topo_etc(Settings.Plotting.LonRange+[-5,5], ...
-                            Settings.Plotting.LatRange+[-5,5], ...
-                            0,0,1,1);
-
-disp('Loaded topography and maps')
+% % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % % %% load background map and topography
+% % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % % 
+% % % [~,Map,~,Coasts] = topo_etc(Settings.Plotting.LonRange+[-5,5], ...
+% % %                             Settings.Plotting.LatRange+[-5,5], ...
+% % %                             0,0,1,1);
+% % % 
+% % % disp('Loaded topography and maps')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% plot!
@@ -319,17 +319,17 @@ for iP=1:1:20;
     %plot a base map
     axis([Settings.Plotting.LonRange Settings.Plotting.LatRange])
     hold on
-    imagesc(Map.LonScale,Map.LatScale,Map.Map)
+% %     imagesc(Map.LonScale,Map.LatScale,Map.Map)
     
     
     %plot data over it
     pcolor(Lon,Lat,PlotData); shading flat;
     
-    %plot continents over top
-    for iCoast=1:1:numel(Coasts)
-      plot(Coasts(iCoast).Lon,Coasts(iCoast).Lat,'-','linewi',0.5,'color',[1,1,1].*0)
-      hold on
-    end
+% %     %plot continents over top
+% %     for iCoast=1:1:numel(Coasts)
+% %       plot(Coasts(iCoast).Lon,Coasts(iCoast).Lat,'-','linewi',0.5,'color',[1,1,1].*0)
+% %       hold on
+% %     end
     
     %plot granule edges
     plot(Lon(  1,:),Lat(  1,:),'k:','linewi',2)
