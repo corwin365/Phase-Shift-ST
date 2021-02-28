@@ -8,7 +8,9 @@ For the code to work, you will need to:
 1. add the directory "functions/" to your Matlab path
 2. add the top-level path for the full set of files to "functions/LocalDataDir". 
 
-After this the code *should* hopefully just work (it does in my tests).
+After this the code *should* hopefully just work (it does in my tests). Note that sections plotting topography and surface maps have been commented
+out - this is because the filesizes of these datasets are too large for this medium. Data used for his purpose in the paper figures were obtained
+from NaturalEarth and the USGS.
 
 
 Figure 1 is generated using "05FlatvsStretch/plot_waves_3d.m"
@@ -28,11 +30,9 @@ The directory "01GettingItWorking" just contains files I used to test concepts, 
 Ignore these, they are just here for completeness.
 
 
-
 For all figures, manual modification to the layout, including adding contextual lines and rearranging panels into figures, was carried out 
 manually in image-editing software. So the above files will not produce final versions as seen in the paper - the contents should be fully 
 consistent however, and demonstrate that the figures accurately represent the input data and our analysis.
 
 
-
-The data/ directory includes the AIRS granules used as tests - these were produced by Lars Hoffman as described in Hoffman and Alexander (JGR, 2009). Imagery and shapefile data are from https://www.naturalearthdata.com/ and NASA.
+The data/ directory includes the AIRS granules used as tests - these were produced by Lars Hoffman as described in Hoffman and Alexander (JGR, 2009).
