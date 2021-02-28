@@ -6,7 +6,7 @@ This is the code underlying Wright et al (2021), a manuscript submitted to Atmos
 
 For the code to work, you will need to:
 1. add the directory "functions/" to your Matlab path
-2. add the top-level path for the full set of files to "functions/LocalDataDir". 
+2. add the top-level path for the full set of files to "functions/LocalDataDir.m". 
 
 After this the code *should* hopefully just work (it does in my tests). Note that sections plotting topography and surface maps have been commented
 out - this is because the filesizes of these datasets are too large for this medium. Data used for his purpose in the paper figures were obtained
@@ -31,7 +31,7 @@ Ignore these, they are just here for completeness.
 
 
 For all figures, manual modification to the layout, including adding contextual lines and rearranging panels into figures, was carried out 
-manually in image-editing software. So the above files will not produce final versions as seen in the paper - the contents should be fully 
+manually in image-editing software. So: the above files will not produce final versions as seen in the paper - the contents should be fully 
 consistent however, and demonstrate that the figures accurately represent the input data and our analysis.
 
 
