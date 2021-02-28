@@ -35,4 +35,4 @@ consistent however, and demonstrate that the figures accurately represent the in
 
 
 
-The data/ directory includes the AIRS granules used as tests - these were produced by Lars Hoffman as described in Hoffman and Alexander (JGR, 2009). Imagery and shapefile data are from https://www.naturalearthdata.com/ and NASA, and topography data are from the US Geological Survey.
+The data/ directory includes the AIRS granules used as tests - these were produced by Lars Hoffman as described in Hoffman and Alexander (JGR, 2009). Imagery and shapefile data are from https://www.naturalearthdata.com/ and NASA.
